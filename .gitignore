@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# PyInstaller 产物
+build/
+dist/
+*.spec
+
+# 运行时按需下载的 ffmpeg
+bin/
+
+# 系统
+.DS_Store
