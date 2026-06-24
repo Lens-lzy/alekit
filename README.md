@@ -1,8 +1,10 @@
-# 🧰 Alek 的锦囊（Alekit）
+# 🧰 Alekit
 
 一个集成的桌面小工具箱：左侧选工具，右侧用。基于 Python + tkinter，跨平台。
 
 > Alekit = **Alek** + **kit**（工具箱）
+>
+> 作者：Alek · 联系：ziyao.alek.liu@gmail.com
 
 ## 内置工具
 

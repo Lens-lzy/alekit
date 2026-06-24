@@ -8,13 +8,19 @@ from __future__ import annotations
 
 import os
 import tkinter as tk
+import webbrowser
 from tkinter import ttk
 
 from tools import TOOLS
 
-APP_TITLE = "Alek 的锦囊"
+APP_NAME = "Alekit"
+APP_VERSION = "1.0.0"
+APP_TITLE = f"{APP_NAME} v{APP_VERSION}"
+REPO_URL = "https://github.com/Lens-lzy/alekit"
+CONTACT_EMAIL = "ziyao.alek.liu@gmail.com"
 SIDEBAR_BG = "#f0f0f3"
 SIDEBAR_SEL = "#d8e6ff"
+LINK_FG = "#2563eb"
 
 
 class Toolbox:
@@ -39,15 +45,26 @@ class Toolbox:
         outer.pack(fill="both", expand=True)
 
         # 左侧栏
-        sidebar = tk.Frame(outer, bg=SIDEBAR_BG, width=180)
+        sidebar = tk.Frame(outer, bg=SIDEBAR_BG, width=190)
         sidebar.pack(side="left", fill="y")
         sidebar.pack_propagate(False)
 
+        # 顶部品牌：名字大、版本号小
+        brand = tk.Frame(sidebar, bg=SIDEBAR_BG)
+        brand.pack(fill="x", padx=16, pady=(18, 12))
         tk.Label(
-            sidebar, text="🧰 Alek 的锦囊", bg=SIDEBAR_BG, fg="#222",
-            font=("", 15, "bold"), anchor="w",
-        ).pack(fill="x", padx=16, pady=(18, 12))
+            brand, text=f"🧰 {APP_NAME}", bg=SIDEBAR_BG, fg="#222",
+            font=("", 18, "bold"), anchor="w",
+        ).pack(anchor="w")
+        tk.Label(
+            brand, text=f"v{APP_VERSION}", bg=SIDEBAR_BG, fg="#888",
+            font=("", 10), anchor="w",
+        ).pack(anchor="w")
 
+        # 底部信息区（钉在左下角）
+        self._build_info(sidebar)
+
+        # 工具列表（占据中间剩余空间）
         for i, cls in enumerate(self.tool_classes):
             item = tk.Label(
                 sidebar,
@@ -73,6 +90,29 @@ class Toolbox:
 
         self.content = ttk.Frame(right)
         self.content.pack(fill="both", expand=True)
+
+    def _build_info(self, sidebar: tk.Frame):
+        """左下角信息区：版本号、GitHub 仓库、联系邮箱。"""
+        info = tk.Frame(sidebar, bg=SIDEBAR_BG)
+        info.pack(side="bottom", fill="x", padx=14, pady=(8, 14))
+
+        tk.Frame(info, bg="#dcdce0", height=1).pack(fill="x", pady=(0, 8))
+
+        def link(text, action, fg=LINK_FG):
+            lbl = tk.Label(
+                info, text=text, bg=SIDEBAR_BG, fg=fg, anchor="w",
+                font=("", 10), cursor="hand2", justify="left",
+            )
+            lbl.pack(anchor="w")
+            lbl.bind("<Button-1>", lambda e: action())
+            return lbl
+
+        tk.Label(
+            info, text=f"关于 · 版本 v{APP_VERSION}", bg=SIDEBAR_BG, fg="#666",
+            font=("", 10, "bold"), anchor="w",
+        ).pack(anchor="w", pady=(0, 4))
+        link("↗ GitHub 仓库", lambda: webbrowser.open(REPO_URL))
+        link(f"✉ {CONTACT_EMAIL}", lambda: webbrowser.open(f"mailto:{CONTACT_EMAIL}"), fg="#555")
 
     def select(self, idx: int):
         if idx == self.current:
