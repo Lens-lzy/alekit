@@ -1,0 +1,60 @@
+name: Build portable apps
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: Alekit-windows
+          - os: macos-latest
+            artifact: Alekit-macos-arm64
+          - os: macos-13
+            artifact: Alekit-macos-intel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: pyinstaller --noconfirm --windowed --onefile --name Alekit toolbox.py
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: pyinstaller --noconfirm --windowed --name Alekit toolbox.py
+
+      - name: Package artifact
+        shell: bash
+        run: |
+          cd dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a "../${{ matrix.artifact }}.zip" Alekit.exe
+          else
+            zip -r "../${{ matrix.artifact }}.zip" Alekit.app
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.zip
+
+      - name: Attach to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact }}.zip
