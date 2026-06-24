@@ -30,9 +30,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt pyinstaller
 
+      - name: Self-test source (Windows)
+        if: runner.os == 'Windows'
+        run: python toolbox.py --selftest
+
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: pyinstaller --noconfirm --windowed --onefile --name Alekit toolbox.py
+
+      - name: Self-test built exe (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath "dist\Alekit.exe" -ArgumentList "--selftest" -PassThru
+          if (-not $p.WaitForExit(90000)) { $p.Kill(); throw "App hung 90s (crash dialog?) - fail" }
+          if ($p.ExitCode -ne 0) { throw "App exited $($p.ExitCode) - fail" }
+          Write-Host "Windows exe self-test passed"
 
       - name: Build (macOS)
         if: runner.os == 'macOS'
