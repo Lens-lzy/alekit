@@ -14,7 +14,7 @@ from tkinter import ttk
 from tools import TOOLS
 
 APP_NAME = "Alekit"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 APP_TITLE = f"{APP_NAME} v{APP_VERSION}"
 REPO_URL = "https://github.com/Lens-lzy/alekit"
 CONTACT_EMAIL = "ziyao.alek.liu@gmail.com"
