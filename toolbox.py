@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-import os
+import sys
 import tkinter as tk
 import webbrowser
 from tkinter import ttk
@@ -138,8 +138,9 @@ class Toolbox:
 
 
 def main():
+    selftest = "--selftest" in sys.argv  # CI 冒烟自检：构建后立即退出，验证不会崩
     root = tk.Tk()
-    if os.uname().sysname == "Darwin":
+    if sys.platform == "darwin":  # 注意：os.uname() 在 Windows 不存在，必须用 sys.platform
         try:
             root.tk.call("tk::unsupported::MacWindowStyle", "style", root, "document", "")
         except tk.TclError:
@@ -147,7 +148,16 @@ def main():
         root.lift()
         root.attributes("-topmost", True)
         root.after(200, lambda: root.attributes("-topmost", False))
-    Toolbox(root)
+
+    app = Toolbox(root)
+    if selftest:
+        # 逐个构建每个工具页，确保都不报错，然后退出（不进入 mainloop）
+        for i in range(len(app.tool_classes)):
+            app.select(i)
+        root.update()
+        root.destroy()
+        print("selftest OK")
+        return
     root.mainloop()
 
 
